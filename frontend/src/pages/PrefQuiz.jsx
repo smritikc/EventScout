@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronLeft, MapPin, DollarSign, Calendar } from 'lucide-react';
+import { MapPin, DollarSign, Calendar, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import '../styles/pref-quiz.css'; // You'll need to create this CSS file
+import '../styles/pref-quiz.css';
 
 const categories = [
   { id: 'tech', name: 'Tech Meetups', emoji: '💻' },
@@ -15,29 +15,29 @@ const categories = [
 ];
 
 const locations = [
-  { id: 'dhangadhi', name: 'Dhangadhi 10km', range: '10km' },
-  { id: 'kailali', name: 'Kailali 50km', range: '50km' },
-  { id: 'sudurpashchim', name: 'Sudurpashchim', range: '100km' },
-  { id: 'nepal', name: 'All Nepal', range: 'nationwide' }
+  { id: 'dhangadhi', name: 'Dhangadhi', range: '10km' },
+  { id: 'kailali', name: 'Kailali', range: '50km' },
+  { id: 'sudurpashchim', name: 'Sudurpashchim', range: 'Region' },
+  { id: 'nepal', name: 'All Nepal', range: 'Nationwide' }
 ];
 
 const frequencies = [
-  { id: 'weekly', name: 'Weekly' },
-  { id: 'monthly', name: 'Monthly' },
-  { id: 'big', name: 'Big Events Only' }
+  { id: 'weekly', name: 'Weekly', desc: 'Active explorer' },
+  { id: 'monthly', name: 'Monthly', desc: 'Occasional outings' },
+  { id: 'big', name: 'Big Events Only', desc: 'Festivals & concerts' }
 ];
 
 const budgets = [
-  { id: 'free', name: 'Free', range: '0' },
-  { id: 'low', name: '<500 NPR', range: '1-500' },
-  { id: 'medium', name: '<2000 NPR', range: '501-2000' },
-  { id: 'any', name: 'Any', range: 'any' }
+  { id: 'free', name: 'Free', desc: '0 NPR' },
+  { id: 'low', name: '<500 NPR', desc: 'Budget friendly' },
+  { id: 'medium', name: '<2000 NPR', desc: 'Standard events' },
+  { id: 'any', name: 'Any', desc: 'No limits' }
 ];
 
 const PrefQuiz = () => {
   const navigate = useNavigate();
-  const { updatePreferences } = useAuth();
-  const [step, setStep] = useState(0);
+  const { user, updatePreferences } = useAuth();
+  
   const [preferences, setPreferences] = useState({
     categories: [],
     location: 'dhangadhi',
@@ -45,121 +45,40 @@ const PrefQuiz = () => {
     budget: 'any'
   });
 
-  const steps = [
-    {
-      title: "What events do you love?",
-      subtitle: "Select all that interest you",
-      component: (
-        <div className="pref-grid">
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                const newCats = preferences.categories.includes(cat.id)
-                  ? preferences.categories.filter(c => c !== cat.id)
-                  : [...preferences.categories, cat.id];
-                setPreferences({ ...preferences, categories: newCats });
-              }}
-              className={`pref-category-btn ${
-                preferences.categories.includes(cat.id) ? 'selected' : ''
-              }`}
-            >
-              <span className="category-emoji">{cat.emoji}</span>
-              <span className="category-name">{cat.name}</span>
-            </button>
-          ))}
-        </div>
-      )
-    },
-    {
-      title: "Where should we look?",
-      subtitle: "Choose your preferred location",
-      component: (
-        <div className="pref-list">
-          {locations.map(loc => (
-            <button
-              key={loc.id}
-              onClick={() => setPreferences({ ...preferences, location: loc.id })}
-              className={`pref-item ${
-                preferences.location === loc.id ? 'selected' : ''
-              }`}
-            >
-              <div className="pref-item-content">
-                <MapPin className="pref-icon" />
-                <span className="pref-name">{loc.name}</span>
-              </div>
-              <span className="pref-range">{loc.range}</span>
-            </button>
-          ))}
-        </div>
-      )
-    },
-    {
-      title: "How often?",
-      subtitle: "Tell us your event frequency preference",
-      component: (
-        <div className="pref-list">
-          {frequencies.map(freq => (
-            <button
-              key={freq.id}
-              onClick={() => setPreferences({ ...preferences, frequency: freq.id })}
-              className={`pref-item ${
-                preferences.frequency === freq.id ? 'selected' : ''
-              }`}
-            >
-              <div className="pref-item-content">
-                <Calendar className="pref-icon" />
-                <span className="pref-name">{freq.name}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      )
-    },
-    {
-      title: "What's your budget?",
-      subtitle: "Set your preferred price range",
-      component: (
-        <div className="pref-list">
-          {budgets.map(budget => (
-            <button
-              key={budget.id}
-              onClick={() => setPreferences({ ...preferences, budget: budget.id })}
-              className={`pref-item ${
-                preferences.budget === budget.id ? 'selected' : ''
-              }`}
-            >
-              <div className="pref-item-content">
-                <DollarSign className="pref-icon" />
-                <span className="pref-name">{budget.name}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      )
+  // Pre-fill if user already has preferences but wants to edit
+  useEffect(() => {
+    if (user?.preferences) {
+      setPreferences(prev => ({
+        ...prev,
+        ...user.preferences
+      }));
     }
-  ];
+  }, [user]);
 
-  const handleNext = () => {
-    if (step === 0 && preferences.categories.length === 0) {
-      toast.error('Please select at least one category');
-      return;
-    }
-    if (step < steps.length - 1) {
-      setStep(step + 1);
-    } else {
-      handleSubmit();
-    }
+  const toggleCategory = (id) => {
+    setPreferences(prev => {
+      const isSelected = prev.categories.includes(id);
+      if (isSelected) {
+        return { ...prev, categories: prev.categories.filter(c => c !== id) };
+      } else {
+        return { ...prev, categories: [...prev.categories, id] };
+      }
+    });
   };
 
-  const handleSubmit = async () => {
+  const handleSave = async () => {
+    if (preferences.categories.length === 0) {
+      toast.error('Please select at least one category to get started!');
+      return;
+    }
     try {
-      await updatePreferences(preferences);
-      toast.success('Preferences saved!');
+      if (updatePreferences) {
+        await updatePreferences(preferences);
+      }
+      toast.success('Preferences saved safely! 🚀');
       navigate('/dashboard');
     } catch {
-      // Removed unused error parameter
-      toast.error('Failed to save preferences');
+      toast.error('Failed to save preferences.');
     }
   };
 
@@ -167,60 +86,128 @@ const PrefQuiz = () => {
     navigate('/dashboard');
   };
 
+  const firstName = user?.name ? user.name.split(' ')[0] : 'there';
+
   return (
     <div className="pref-quiz-page">
       <div className="pref-quiz-container">
         {/* Header */}
         <div className="pref-quiz-header">
-          <h1 className="pref-quiz-title">Help us find your perfect events!</h1>
-          <p className="pref-quiz-step">Step {step + 1} of {steps.length}</p>
+          <h1 className="pref-quiz-title">
+            🎯 Help us find your perfect events, {firstName}!
+          </h1>
+          <p className="pref-quiz-subtitle">
+            Personalize your EventScout experience in 30 seconds.
+          </p>
         </div>
 
-        {/* Progress Bar */}
-        <div className="pref-progress">
-          <div 
-            className="pref-progress-bar"
-            style={{ width: `${((step + 1) / steps.length) * 100}%` }}
-          />
-        </div>
-
-        {/* Content */}
+        {/* Scrollable Form Content */}
         <div className="pref-quiz-content">
-          <h2 className="pref-question">
-            {steps[step].title}
-          </h2>
-          <p className="pref-subtitle">{steps[step].subtitle}</p>
+          
+          <section className="pref-section">
+            <div className="pref-section-header">
+              <h2>1. What kind of events do you love?</h2>
+              <span>Select all that apply</span>
+            </div>
+            <div className="pref-grid categories-grid">
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => toggleCategory(cat.id)}
+                  className={`pref-category-btn ${
+                    preferences.categories.includes(cat.id) ? 'selected' : ''
+                  }`}
+                >
+                  <span className="category-emoji">{cat.emoji}</span>
+                  <span className="category-name">{cat.name}</span>
+                </button>
+              ))}
+            </div>
+          </section>
 
-          {steps[step].component}
+          <section className="pref-section">
+            <div className="pref-section-header">
+              <h2>2. How far are you willing to travel?</h2>
+              <span>Location & Radius</span>
+            </div>
+            <div className="pref-grid locations-grid">
+              {locations.map(loc => (
+                <button
+                  key={loc.id}
+                  onClick={() => setPreferences({ ...preferences, location: loc.id })}
+                  className={`pref-option-btn ${
+                    preferences.location === loc.id ? 'selected' : ''
+                  }`}
+                >
+                  <MapPin className="pref-icon" size={20} />
+                  <div className="pref-option-info">
+                    <span className="pref-name">{loc.name}</span>
+                    <span className="pref-desc">{loc.range}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
 
-          {/* Navigation */}
-          <div className="pref-nav">
-            {step > 0 && (
-              <button
-                onClick={() => setStep(step - 1)}
-                className="pref-nav-btn back"
-              >
-                <ChevronLeft size={20} />
-                Back
-              </button>
-            )}
-            <button
-              onClick={handleNext}
-              className="pref-nav-btn next"
-            >
-              {step === steps.length - 1 ? 'Save Preferences' : 'Next'}
-              {step < steps.length - 1 && <ChevronRight size={20} />}
-            </button>
-          </div>
+          <section className="pref-section">
+            <div className="pref-section-header">
+              <h2>3. How often do you want to go out?</h2>
+              <span>Frequency</span>
+            </div>
+            <div className="pref-grid freq-grid">
+              {frequencies.map(freq => (
+                <button
+                  key={freq.id}
+                  onClick={() => setPreferences({ ...preferences, frequency: freq.id })}
+                  className={`pref-option-btn ${
+                    preferences.frequency === freq.id ? 'selected' : ''
+                  }`}
+                >
+                  <Calendar className="pref-icon" size={20} />
+                  <div className="pref-option-info">
+                    <span className="pref-name">{freq.name}</span>
+                    <span className="pref-desc">{freq.desc}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
 
-          {step === 0 && (
-            <button
-              onClick={handleSkip}
-              className="pref-skip-btn"
-            >
-              Skip for now
-            </button>
-          )}
+          <section className="pref-section">
+            <div className="pref-section-header">
+              <h2>4. What's your typical budget?</h2>
+              <span>Per event</span>
+            </div>
+            <div className="pref-grid budget-grid">
+              {budgets.map(budget => (
+                <button
+                  key={budget.id}
+                  onClick={() => setPreferences({ ...preferences, budget: budget.id })}
+                  className={`pref-option-btn ${
+                    preferences.budget === budget.id ? 'selected' : ''
+                  }`}
+                >
+                  <DollarSign className="pref-icon" size={20} />
+                  <div className="pref-option-info">
+                    <span className="pref-name">{budget.name}</span>
+                    <span className="pref-desc">{budget.desc}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+        </div>
+
+        {/* Sticky Actions Footer */}
+        <div className="pref-quiz-footer">
+          <button onClick={handleSkip} className="btn-skip">
+            Skip for Now
+          </button>
+          <button onClick={handleSave} className="btn-save pulse-action">
+            Save & Continue
+            <ChevronRight size={20} />
+          </button>
         </div>
       </div>
     </div>
