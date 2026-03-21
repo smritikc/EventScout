@@ -6,32 +6,32 @@ import toast from 'react-hot-toast';
 import '../styles/pref-quiz.css';
 
 const categories = [
-  { id: 'tech', name: 'Tech Meetups', emoji: '💻' },
-  { id: 'cultural', name: 'Cultural', emoji: '🎭' },
-  { id: 'music', name: 'Music', emoji: '🎵' },
-  { id: 'sports', name: 'Sports', emoji: '⚽' },
-  { id: 'food', name: 'Food', emoji: '🍜' },
-  { id: 'workshops', name: 'Workshops', emoji: '🔧' }
+  { id: 'Tech Meetups', name: 'Tech Meetups', emoji: '💻' },
+  { id: 'Cultural', name: 'Cultural', emoji: '🎭' },
+  { id: 'Music', name: 'Music', emoji: '🎵' },
+  { id: 'Sports', name: 'Sports', emoji: '⚽' },
+  { id: 'Food', name: 'Food', emoji: '🍜' },
+  { id: 'Workshops', name: 'Workshops', emoji: '🔧' }
 ];
 
 const locations = [
-  { id: 'dhangadhi', name: 'Dhangadhi', range: '10km' },
-  { id: 'kailali', name: 'Kailali', range: '50km' },
-  { id: 'sudurpashchim', name: 'Sudurpashchim', range: 'Region' },
-  { id: 'nepal', name: 'All Nepal', range: 'Nationwide' }
+  { id: 'Dhangadhi 10km', name: 'Dhangadhi', range: '10km' },
+  { id: 'Kailali 50km', name: 'Kailali', range: '50km' },
+  { id: 'Sudurpashchim', name: 'Sudurpashchim', range: 'Region' },
+  { id: 'All Nepal', name: 'All Nepal', range: 'Nationwide' }
 ];
 
 const frequencies = [
-  { id: 'weekly', name: 'Weekly', desc: 'Active explorer' },
-  { id: 'monthly', name: 'Monthly', desc: 'Occasional outings' },
-  { id: 'big', name: 'Big Events Only', desc: 'Festivals & concerts' }
+  { id: 'Weekly', name: 'Weekly', desc: 'Active explorer' },
+  { id: 'Monthly', name: 'Monthly', desc: 'Occasional outings' },
+  { id: 'Big Events Only', name: 'Big Events Only', desc: 'Festivals & concerts' }
 ];
 
 const budgets = [
-  { id: 'free', name: 'Free', desc: '0 NPR' },
-  { id: 'low', name: '<500 NPR', desc: 'Budget friendly' },
-  { id: 'medium', name: '<2000 NPR', desc: 'Standard events' },
-  { id: 'any', name: 'Any', desc: 'No limits' }
+  { id: 'Free', name: 'Free', desc: '0 NPR' },
+  { id: '<500 NPR', name: '<500 NPR', desc: 'Budget friendly' },
+  { id: '<2000 NPR', name: '<2000 NPR', desc: 'Standard events' },
+  { id: 'Any', name: 'Any', desc: 'No limits' }
 ];
 
 const PrefQuiz = () => {
@@ -40,9 +40,9 @@ const PrefQuiz = () => {
   
   const [preferences, setPreferences] = useState({
     categories: [],
-    location: 'dhangadhi',
-    frequency: 'weekly',
-    budget: 'any'
+    locationRadius: 'Dhangadhi 10km',
+    frequency: 'Weekly',
+    budgetRange: 'Any'
   });
 
   // Pre-fill if user already has preferences but wants to edit
@@ -134,9 +134,9 @@ const PrefQuiz = () => {
               {locations.map(loc => (
                 <button
                   key={loc.id}
-                  onClick={() => setPreferences({ ...preferences, location: loc.id })}
+                  onClick={() => setPreferences({ ...preferences, locationRadius: loc.id })}
                   className={`pref-option-btn ${
-                    preferences.location === loc.id ? 'selected' : ''
+                    preferences.locationRadius === loc.id ? 'selected' : ''
                   }`}
                 >
                   <MapPin className="pref-icon" size={20} />
@@ -182,9 +182,9 @@ const PrefQuiz = () => {
               {budgets.map(budget => (
                 <button
                   key={budget.id}
-                  onClick={() => setPreferences({ ...preferences, budget: budget.id })}
+                  onClick={() => setPreferences({ ...preferences, budgetRange: budget.id })}
                   className={`pref-option-btn ${
-                    preferences.budget === budget.id ? 'selected' : ''
+                    preferences.budgetRange === budget.id ? 'selected' : ''
                   }`}
                 >
                   <DollarSign className="pref-icon" size={20} />

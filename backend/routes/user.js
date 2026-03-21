@@ -1,10 +1,9 @@
 import express from 'express';
+import { updateUserPreferences } from '../controllers/userController.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// test route
-router.get('/', (req, res) => {
-  res.send('Users route working');
-});
+router.put('/preferences', protect, updateUserPreferences);
 
 export default router;
