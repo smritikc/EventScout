@@ -1,9 +1,9 @@
-import User from '../routes/Users.js';
+import User from '../models/Users.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 // Generate JWT Token
-const generateToken = (id) => {
+export const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: '30d'
   });

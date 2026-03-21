@@ -146,11 +146,19 @@ const Login = () => {
           </div>
 
           <div className="social-login">
-            <button className="social-btn google">
+            <button 
+              type="button" 
+              className="social-btn google"
+              onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`}
+            >
               <img src="https://www.google.com/favicon.ico" alt="Google" />
               Google
             </button>
-            <button className="social-btn facebook">
+            <button 
+              type="button" 
+              className="social-btn facebook"
+              onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/auth/facebook`}
+            >
               <img src="https://www.facebook.com/favicon.ico" alt="Facebook" />
               Facebook
             </button>

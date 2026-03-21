@@ -117,6 +117,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithToken = async (newToken) => {
+    try {
+      localStorage.setItem('token', newToken);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+      setToken(newToken);
+      
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/auth/me`);
+      setUser(response.data.user);
+      
+      toast.success('Welcome back! 🎉');
+      navigate('/dashboard');
+      return { success: true };
+    } catch {
+      localStorage.removeItem('token');
+      setToken(null);
+      delete axios.defaults.headers.common['Authorization'];
+      toast.error('Authentication failed');
+      navigate('/login');
+      return { success: false };
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -124,6 +146,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updatePreferences,
+    loginWithToken,
     isAuthenticated: !!user
   };
 

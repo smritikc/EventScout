@@ -13,6 +13,7 @@ import Search from './pages/Search';
 import Calendar from './pages/Calendar';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
+import OAuthSuccess from './pages/OAuthSuccess';
 import './styles/global.css';
 
 const queryClient = new QueryClient();
@@ -83,6 +84,7 @@ function App() {
                   <Profile />
                 </PrivateRoute>
               } />
+              <Route path="/oauth-success" element={<OAuthSuccess />} />
               <Route path="/" element={<Navigate to="/dashboard" />} />
             </Routes>
           </div>
