@@ -156,6 +156,14 @@
 
 .profile-dropdown button:hover { background: #f9fafb; }
 .profile-dropdown button.logout { color: #ef4444; }
+.profile-dropdown button.special-link { 
+  color: #4f46e5; 
+  font-weight: 700; 
+  background: #f5f3ff;
+}
+.profile-dropdown button.special-link:hover {
+  background: #ede9fe;
+}
 
 .notif-item {
   display: flex;
@@ -185,13 +193,10 @@
   padding: 1rem;
 }
 
+/* Animation classes handled by GSAP in Dashboard.jsx */
 .section-animate {
-  animation: slideUp 0.5s ease-out forwards;
-  opacity: 0;
+  position: relative;
 }
-
-.delay-1 { animation-delay: 0.1s; }
-.delay-2 { animation-delay: 0.2s; }
 
 .greeting {
   font-size: 1.15rem;

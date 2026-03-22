@@ -12,7 +12,8 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    role: 'user'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -230,6 +231,12 @@ const Register = () => {
               Already have an account?{' '}
               <Link to="/login" className="auth-link">
                 Sign In
+              </Link>
+            </p>
+            <p className="mt-2 text-sm">
+              Want to host events? {' '}
+              <Link to="/organizer-register" className="auth-link font-bold">
+                Register as Organizer
               </Link>
             </p>
           </div>

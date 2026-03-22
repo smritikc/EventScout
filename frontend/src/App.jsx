@@ -14,6 +14,9 @@ import Calendar from './pages/Calendar';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
 import OAuthSuccess from './pages/OAuthSuccess';
+import Landing from './pages/Landing';
+import OrganizerDashboard from './pages/OrganizerDashboard';
+import OrganizerRegister from './pages/OrganizerRegister';
 import './styles/global.css';
 
 const queryClient = new QueryClient();
@@ -84,8 +87,14 @@ function App() {
                   <Profile />
                 </PrivateRoute>
               } />
+              <Route path="/organizer-dashboard" element={
+                <PrivateRoute>
+                  <OrganizerDashboard />
+                </PrivateRoute>
+              } />
+              <Route path="/organizer-register" element={<OrganizerRegister />} />
               <Route path="/oauth-success" element={<OAuthSuccess />} />
-              <Route path="/" element={<Navigate to="/dashboard" />} />
+              <Route path="/" element={<Landing />} />
             </Routes>
           </div>
         </AuthProvider>

@@ -1,5 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -49,11 +48,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password, role) => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
         email,
-        password
+        password,
+        role
       });
       
       const { token, user } = response.data;
@@ -62,21 +62,27 @@ export const AuthProvider = ({ children }) => {
       setToken(token);
       setUser(user);
       
-      toast.success('Welcome back! 🎉');
-      navigate('/dashboard');
-      return { success: true };
+      toast.success(`Welcome back, ${user.role === 'organizer' ? 'Organizer' : 'Attendee'}! 🎉`);
+      
+      if (user.role === 'organizer') {
+        // navigate('/organizer-dashboard');
+      } else {
+        // navigate('/dashboard');
+      }
+      return { success: true, user };
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed');
       return { success: false, error: error.response?.data?.message };
     }
-  };
+  }, [navigate]);
 
-  const register = async (name, email, password) => {
+  const register = useCallback(async (name, email, password) => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, {
         name,
         email,
-        password
+        password,
+        role: 'user'
       });
       
       const { token, user } = response.data;
@@ -85,25 +91,44 @@ export const AuthProvider = ({ children }) => {
       setToken(token);
       setUser(user);
       
-      toast.success('Account created successfully! 🎉');
-      navigate('/pref-quiz');
-      return { success: true };
+      toast.success('Attendee account created! 🎉');
+      // navigate('/pref-quiz');
+      return { success: true, user };
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed');
       return { success: false, error: error.response?.data?.message };
     }
-  };
+  }, [navigate]);
 
-  const logout = () => {
+  const registerOrganizer = useCallback(async (formData) => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/organizers/register`, formData);
+      
+      const { token, user } = response.data;
+      localStorage.setItem('token', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      setToken(token);
+      setUser(user);
+      
+      toast.success('Organizer account created! 🚀');
+      // navigate('/organizer-dashboard');
+      return { success: true, user };
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Organizer registration failed');
+      return { success: false };
+    }
+  }, [navigate]);
+
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
     setToken(null);
     setUser(null);
     toast.success('Logged out successfully');
     navigate('/login');
-  };
+  }, [navigate]);
 
-  const updatePreferences = async (preferences) => {
+  const updatePreferences = useCallback(async (preferences) => {
     try {
       const response = await axios.put(`${import.meta.env.VITE_API_URL}/users/preferences`, {
         preferences
@@ -115,9 +140,9 @@ export const AuthProvider = ({ children }) => {
       toast.error('Failed to update preferences');
       return { success: false };
     }
-  };
+  }, []);
 
-  const loginWithToken = async (newToken) => {
+  const loginWithToken = useCallback(async (newToken) => {
     try {
       localStorage.setItem('token', newToken);
       axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
@@ -127,8 +152,8 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
       
       toast.success('Welcome back! 🎉');
-      navigate('/dashboard');
-      return { success: true };
+      // navigate('/dashboard');
+      return { success: true, user: response.data.user };
     } catch {
       localStorage.removeItem('token');
       setToken(null);
@@ -137,16 +162,32 @@ export const AuthProvider = ({ children }) => {
       navigate('/login');
       return { success: false };
     }
-  };
+  }, [navigate]);
+
+  const updateRole = useCallback(async (role) => {
+    try {
+      const response = await axios.patch(`${import.meta.env.VITE_API_URL}/users/role`, {
+        role
+      });
+      setUser(prev => ({ ...prev, role: response.data.user.role }));
+      toast.success(`Switched to ${role} role!`);
+      return { success: true };
+    } catch {
+      toast.error('Failed to update role');
+      return { success: false };
+    }
+  }, []);
 
   const value = {
     user,
     loading,
     login,
     register,
+    registerOrganizer,
     logout,
     updatePreferences,
     loginWithToken,
+    updateRole,
     isAuthenticated: !!user
   };
 

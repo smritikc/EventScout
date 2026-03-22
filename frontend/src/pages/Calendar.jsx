@@ -21,17 +21,7 @@ const Calendar = () => {
   const calendarRef = useRef(null);
   const eventsRef = useRef(null);
 
-  useEffect(() => {
-    fetchEvents();
-    
-    // Entrance animation
-    gsap.from(calendarRef.current, {
-      opacity: 0,
-      y: 30,
-      duration: 0.6,
-      ease: 'power3.out'
-    });
-  }, []);
+  
 
   useEffect(() => {
     // Animate events when they load or date changes

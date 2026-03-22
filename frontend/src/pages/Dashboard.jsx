@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import gsap from 'gsap';
 import { 
   Bell, MapPin, Search, Calendar, Heart, 
   Home, User, Menu, ChevronDown, CheckCircle, AlertCircle
@@ -11,39 +12,47 @@ import { getEvents, rsvpEvent, saveEvent } from '../services/eventService';
 import { getNotifications, markAsRead } from '../services/notificationService';
 import EventCard from '../components/EventCard';
 import RSVPModal from '../components/RSVPModal';
+import NotifMenu from '../components/dashboard/NotifMenu';
+import ProfileMenu from '../components/dashboard/ProfileMenu';
+import RecommendationGrid from '../components/dashboard/RecommendationGrid';
 import '../styles/dashboard.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, updateRole } = useAuth();
   const [events, setEvents] = useState([]);
   const [recommendedEvents, setRecommendedEvents] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState('Dhangadhi 10km');
+  const [currentLocation, setCurrentLocation] = useState('All Nepal');
   const [loading, setLoading] = useState(true);
   
   // Modal states
   const [selectedEventForRSVP, setSelectedEventForRSVP] = useState(null);
 
+  const categoriesStr = user?.preferences?.categories?.join(',') || '';
+
   const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
-      const [eventsData, notifData] = await Promise.all([
+      const [eventsDataRaw, notifDataRaw] = await Promise.all([
         getEvents({ location: currentLocation }),
         getNotifications()
       ]);
       
-      const todayEvents = eventsData.filter(e => isToday(new Date(e.date)));
+      const eventsData = eventsDataRaw || [];
+      const notifData = notifDataRaw || [];
+      
+      const todayEvents = eventsData.filter(e => e.date && isToday(new Date(e.date)));
       setEvents(todayEvents);
       
-      const userPrefs = user?.preferences?.categories || [];
+      const userPrefs = categoriesStr ? categoriesStr.split(',') : [];
       const recs = eventsData
-        .filter(e => userPrefs.includes(e.category) && isFuture(new Date(e.date)))
-        .slice(0, 6); // 3x2 grid approx
+        .filter(e => e.category && userPrefs.includes(e.category) && isFuture(new Date(e.date)))
+        .slice(0, 6);
       
-      setRecommendedEvents(recs.length > 0 ? recs : eventsData.slice(0, 6)); // Fallback if no exact matches
+      setRecommendedEvents(recs.length > 0 ? recs : eventsData.slice(0, 6));
       setNotifications(notifData);
       
     } catch {
@@ -51,11 +60,25 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentLocation, user?.preferences?.categories]);
+  }, [currentLocation, categoriesStr]);
 
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
+
+  // Entrance animation when data is loaded
+  useEffect(() => {
+    if (!loading) {
+      gsap.from('.section-animate', {
+        opacity: 0,
+        y: 20,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'power2.out',
+        clearProps: 'all' // Clean up inline styles after animation
+      });
+    }
+  }, [loading]);
 
   const handleRSVPClick = (event) => {
     setSelectedEventForRSVP(event);
@@ -83,16 +106,17 @@ const Dashboard = () => {
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const safeNotifications = Array.isArray(notifications) ? notifications : [];
+  const unreadCount = safeNotifications.filter(n => n && !n.read).length;
   const hasPreferences = user?.preferences?.categories?.length > 0;
   
   // Custom Notification Mock to fit specs if DB returns empty
-  const displayNotifications = notifications.length > 0 ? notifications : [
+  const displayNotifications = safeNotifications.length > 0 ? safeNotifications : [
     { _id: '1', title: 'Tech Meetup: 5 seats left!', createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), read: false, type: 'seat_alert' },
     { _id: '2', title: 'Your RSVP confirmed: Dashain Mela', createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), read: true, type: 'rsvp_status' },
     { _id: '3', title: 'New events matching your prefs', createdAt: new Date(), read: false, type: 'recommendation' }
   ];
-  const realUnreadCount = notifications.length > 0 ? unreadCount : 2;
+  const realUnreadCount = safeNotifications.length > 0 ? unreadCount : 2;
 
   return (
     <div className="dashboard-layout">
@@ -112,31 +136,11 @@ const Dashboard = () => {
       <header className="dash-header">
         <div className="header-actions">
           {/* Notifications */}
-          <div className="header-item notification-wrapper">
-            <button className="icon-btn" onClick={() => setShowNotifications(!showNotifications)}>
-              <Bell size={22} className={realUnreadCount > 0 ? 'ringing' : ''}/>
-              {realUnreadCount > 0 && <span className="badge">{realUnreadCount}</span>}
-            </button>
-
-            {/* Notification Dropdown */}
-            {showNotifications && (
-              <div className="notif-dropdown">
-                {displayNotifications.map(n => (
-                  <div key={n._id} className={`notif-item ${!n.read ? 'unread' : ''}`}>
-                    <div className="notif-icon">
-                      {n.type === 'seat_alert' && <AlertCircle size={16} color="#ef4444"/>}
-                      {n.type === 'rsvp_status' && <CheckCircle size={16} color="#10b981"/>}
-                      {n.type === 'recommendation' && <Star size={16} color="#f59e0b"/>}
-                    </div>
-                    <div className="notif-content">
-                      <p>{n.title}</p>
-                      <span>{formatDistanceToNow(new Date(n.createdAt))} ago</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <NotifMenu 
+            notifications={notifications} 
+            show={showNotifications} 
+            onToggle={() => setShowNotifications(!showNotifications)} 
+          />
 
           {/* Location Toggle */}
           <div className="header-item location-selector">
@@ -150,23 +154,13 @@ const Dashboard = () => {
           </div>
 
           {/* Profile Menu */}
-          <div className="header-item profile-menu-wrapper">
-            <button className="profile-trigger" onClick={() => setShowProfileMenu(!showProfileMenu)}>
-              <Menu size={18} />
-              <span>Profile</span>
-              <ChevronDown size={14} />
-            </button>
-
-            {showProfileMenu && (
-              <div className="profile-dropdown">
-                <button onClick={() => navigate('/pref-quiz')}>My Preferences</button>
-                <button onClick={() => navigate('/calendar')}>My RSVPs</button>
-                <button onClick={() => navigate('/wishlist')}>Wishlist</button>
-                <button onClick={() => navigate('/profile')}>Account Settings</button>
-                <button onClick={logout} className="logout">Logout</button>
-              </div>
-            )}
-          </div>
+          <ProfileMenu 
+            user={user} 
+            show={showProfileMenu} 
+            onToggle={() => setShowProfileMenu(!showProfileMenu)}
+            logout={logout}
+            updateRole={updateRole}
+          />
         </div>
       </header>
 
@@ -217,25 +211,12 @@ const Dashboard = () => {
           <div className="rec-header">
             <h3>🎯 Based on your tech prefs:</h3>
           </div>
-          <div className="rec-grid">
-            {loading ? (
-               Array.from({length: 4}).map((_,i) => <div key={i} className="skeleton-card small"></div>)
-            ) : recommendedEvents.length > 0 ? (
-              recommendedEvents.map(event => (
-                <EventCard 
-                  key={`rec-${event._id}`} 
-                  event={event} 
-                  onRSVP={handleRSVPClick}
-                  onSave={handleSave}
-                  className="compact"
-                />
-              ))
-            ) : (
-              <div className="empty-state">
-                <p>No matches yet. Try broadening filters?</p>
-              </div>
-            )}
-          </div>
+          <RecommendationGrid 
+            events={recommendedEvents} 
+            loading={loading} 
+            onRSVP={handleRSVPClick} 
+            onSave={handleSave} 
+          />
           {recommendedEvents.length > 0 && (
             <button className="btn-see-all" onClick={() => navigate('/search')}>
               See All Recommendations

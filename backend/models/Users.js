@@ -49,6 +49,15 @@ const userSchema = new mongoose.Schema({
     recommendations: { type: Boolean, default: true },
     rsvpStatus: { type: Boolean, default: true }
   },
+  savedEvents: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event'
+  }],
+  role: {
+    type: String,
+    enum: ['user', 'organizer'],
+    default: 'user'
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -60,7 +69,7 @@ userSchema.pre('save', async function() {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.matchPassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 

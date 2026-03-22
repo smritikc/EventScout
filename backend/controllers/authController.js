@@ -1,10 +1,11 @@
 import User from '../models/Users.js';
+import Organizer from '../models/Organizers.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 // Generate JWT Token
-export const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+export const generateToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: '30d'
   });
 };
@@ -14,19 +15,22 @@ export const generateToken = (id) => {
 // @access  Public
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
-    // Check if user exists
+    // Check if user exists in either collection
     const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+    const organizerExists = await Organizer.findOne({ email });
+
+    if (userExists || organizerExists) {
+      return res.status(400).json({ message: 'Account already exists with this email' });
     }
 
     // Create user
     const user = await User.create({
       name,
       email,
-      password
+      password,
+      role: role || 'user'
     });
 
     // Generate token
@@ -38,6 +42,7 @@ export const register = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
         preferences: user.preferences
       }
     });
@@ -52,30 +57,44 @@ export const register = async (req, res) => {
 // @access  Public
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
-    // Check for user
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+    let account = null;
+
+    if (role === 'organizer') {
+      account = await Organizer.findOne({ email }).select('+password');
+    } else if (role === 'attendee' || role === 'user') {
+      account = await User.findOne({ email }).select('+password');
+    } else {
+      // Fallback: Check both if no role specified (for backward compatibility)
+      account = await User.findOne({ email }).select('+password');
+      if (!account) {
+        account = await Organizer.findOne({ email }).select('+password');
+      }
+    }
+
+    if (!account) {
+      return res.status(401).json({ message: 'Email not registered' });
     }
 
     // Check password
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    const isPasswordMatch = await account.matchPassword(password);
     if (!isPasswordMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Incorrect password' });
     }
 
-    // Generate token
-    const token = generateToken(user._id);
+    // Generate token with role
+    const token = generateToken(account._id, account.role || (account.organizationName ? 'organizer' : 'user'));
 
     res.json({
       token,
       user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        preferences: user.preferences
+        id: account._id,
+        name: account.name,
+        email: account.email,
+        role: account.role || (account.organizationName ? 'organizer' : 'user'),
+        organizationName: account.organizationName,
+        preferences: account.preferences
       }
     });
   } catch (error) {
@@ -89,8 +108,8 @@ export const login = async (req, res) => {
 // @access  Private
 export const getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
-    res.json({ user });
+    // req.user is already set by protect middleware
+    res.json({ user: req.user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error', error: error.message });

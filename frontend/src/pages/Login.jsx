@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, LogIn, Eye, EyeOff } from 'lucide-react';
 import gsap from 'gsap';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,10 @@ import '../styles/login.css';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/dashboard';
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get('type'); // 'attendee' or 'organizer'
   const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
@@ -39,15 +43,20 @@ const Login = () => {
       yoyo: true,
       repeat: 1
     });
-
-    const result = await login(formData.email, formData.password);
+    
+    // Pass the 'type' as the role parameter
+    const result = await login(formData.email, formData.password, type);
     
     if (result.success) {
+      const destination = result.user?.role === 'organizer' 
+        ? '/organizer-dashboard' 
+        : (from || '/dashboard');
+
       gsap.to('.auth-container', {
         opacity: 0,
         y: -30,
         duration: 0.5,
-        onComplete: () => navigate('/dashboard')
+        onComplete: () => navigate(destination, { replace: true })
       });
     }
     
@@ -59,8 +68,15 @@ const Login = () => {
       <div className="auth-container">
         <div className="auth-card" ref={formRef}>
           <div className="auth-header">
-            <h1 className="auth-title">Welcome Back! 👋</h1>
-            <p className="auth-subtitle">Sign in to continue your event journey</p>
+            <h1 className="auth-title">
+              {type === 'organizer' ? 'Organizer Portal' : 'Welcome Back! 👋'}
+            </h1>
+            <p className="auth-subtitle">
+              {type === 'organizer' 
+                ? 'Sign in to manage your hosted experiences' 
+                : 'Sign in to continue your event journey'
+              }
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
@@ -135,8 +151,8 @@ const Login = () => {
           <div className="auth-footer">
             <p>
               Don't have an account?{' '}
-              <Link to="/register" className="auth-link">
-                Create Account
+              <Link to={type === 'organizer' ? "/organizer-register" : "/register"} className="auth-link">
+                Create {type === 'organizer' ? 'Organizer' : 'Account'}
               </Link>
             </p>
           </div>

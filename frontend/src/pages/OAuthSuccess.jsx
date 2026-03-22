@@ -27,7 +27,10 @@ const OAuthSuccess = () => {
 
       if (token) {
         const result = await loginWithToken(token);
-        if (!result.success) {
+        if (result.success) {
+          const destination = result.user?.role === 'organizer' ? '/organizer-dashboard' : '/dashboard';
+          navigate(destination);
+        } else {
           navigate('/login');
         }
       } else {

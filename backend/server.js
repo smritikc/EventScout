@@ -11,6 +11,7 @@ import './config/passport.js';
 import userRoutes from './routes/user.js'
 import eventRoutes from './routes/events.js';
 import notificationRoutes from './routes/notification.js';
+import organizerRoutes from './routes/organizers.js';
 import authRoutes from './routes/auth.js';
 
 
@@ -42,6 +43,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/organizers', organizerRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
