@@ -1,8 +1,7 @@
-// import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// import gsap from 'gsap';
+import { CheckCircle, AlertCircle } from 'lucide-react';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Login from './pages/Login';
@@ -41,13 +40,13 @@ function App() {
                   padding: '1rem',
                 },
                 success: {
-                  icon: '🎉',
+                  icon: <CheckCircle size={20} color="#10b981" />,
                   style: {
                     borderLeft: '4px solid #10b981',
                   },
                 },
                 error: {
-                  icon: '😕',
+                  icon: <AlertCircle size={20} color="#ef4444" />,
                   style: {
                     borderLeft: '4px solid #ef4444',
                   },

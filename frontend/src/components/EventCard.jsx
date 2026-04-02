@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Users, Star, Heart, Share2, Clock } from 'lucide-react';
+import { MapPin, Users, Star, Heart, Share2, Clock, Calendar, Ticket } from 'lucide-react';
 import { format } from 'date-fns';
 import '../styles/event-card.css';
 
@@ -34,7 +34,7 @@ const EventCard = ({ event, onRSVP, onSave, className = '' }) => {
           <img src={event.images[0]} alt={event.title} />
         ) : (
           <div className="event-image-placeholder">
-            <span>{event.category?.charAt(0) || '📅'}</span>
+            <span>{event.category?.charAt(0) || <Calendar size={16} />}</span>
           </div>
         )}
         
@@ -51,11 +51,11 @@ const EventCard = ({ event, onRSVP, onSave, className = '' }) => {
         <h3 className="event-title">{event.title}</h3>
         
         <p className="event-date-venue">
-          📅 {format(new Date(event.date), 'EEE, h:a')} • {event.location?.venue || 'TBD'}
+          <Calendar size={14} style={{ verticalAlign: 'middle', marginRight: '0.25rem' }} /> {format(new Date(event.date), 'EEE, h:a')} • {event.location?.venue || 'TBD'}
         </p>
 
         <p className="event-stats-line">
-          🎟️ {isFree ? 'Free' : `Rs. ${event.price}`} • {availableSeats}/{event.capacity} seats • {event.rating?.average || '4.8'}⭐ ({event.rating?.count || 23})
+          <Ticket size={14} style={{ verticalAlign: 'middle', marginRight: '0.25rem' }} /> {isFree ? 'Free' : `Rs. ${event.price}`} • {availableSeats}/{event.capacity} seats • <Star size={14} fill="#f59e0b" color="#f59e0b" style={{ verticalAlign: 'middle' }} /> {event.rating?.average || '4.8'} ({event.rating?.count || 23})
         </p>
 
         <div className="event-card-actions">

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, Building, Info, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, Building, Info, ArrowRight, BarChart3, Zap, CreditCard } from 'lucide-react';
 import gsap from 'gsap';
 import { useAuth } from '../context/AuthContext';
 import '../styles/auth.css';
@@ -45,7 +45,7 @@ const OrganizerRegister = () => {
       <div className="auth-container">
         <div className="auth-card" ref={formRef}>
           <div className="auth-header">
-            <h1 className="auth-title">Host Experiences 🚀</h1>
+            <h1 className="auth-title">Host Experiences</h1>
             <p className="auth-subtitle">Create an organizer account and start hosting events</p>
           </div>
 
@@ -108,9 +108,9 @@ const OrganizerRegister = () => {
             <h2>Reach Your Audience</h2>
             <p>Join 1,000+ organizers who trust EventScout to power their communities.</p>
             <div className="feature-list">
-              <div className="feature-item"><span>📊</span> <span>Advanced Analytics</span></div>
-              <div className="feature-item"><span>🚀</span> <span>Easy Promotion</span></div>
-              <div className="feature-item"><span>💳</span> <span>Secure Payments</span></div>
+              <div className="feature-item"><span><BarChart3 size={20} /></span> <span>Advanced Analytics</span></div>
+              <div className="feature-item"><span><Zap size={20} /></span> <span>Easy Promotion</span></div>
+              <div className="feature-item"><span><CreditCard size={20} /></span> <span>Secure Payments</span></div>
             </div>
           </div>
         </div>

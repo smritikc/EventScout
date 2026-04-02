@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { 
   Bell, MapPin, Search, Calendar, Heart, 
-  Home, User, Menu, ChevronDown, CheckCircle, AlertCircle
+  Home, User, Menu, ChevronDown, CheckCircle, AlertCircle,
+  Crosshair, Send, CalendarSearch
 } from 'lucide-react';
 import { isToday, isFuture, formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -56,7 +57,7 @@ const Dashboard = () => {
       setNotifications(notifData);
       
     } catch {
-      toast.error('Failed to load dashboard', { icon: '😕' });
+      toast.error('Failed to load dashboard');
     } finally {
       setLoading(false);
     }
@@ -87,8 +88,8 @@ const Dashboard = () => {
   const confirmRSVP = async ({ guests, status }) => {
     try {
       await rsvpEvent(selectedEventForRSVP._id, guests);
-      toast.success('Your RSVP confirmed! 🎉');
-      toast('Organizer notified instantly.', { icon: '📨', duration: 2500 });
+      toast.success('Your RSVP confirmed!');
+      toast('Organizer notified instantly.', { icon: <Send size={16} color="#4f46e5" />, duration: 2500 });
       fetchDashboardData();
     } catch {
       toast.error('Failed to confirm RSVP');
@@ -100,7 +101,7 @@ const Dashboard = () => {
   const handleSave = async (eventId) => {
     try {
       await saveEvent(eventId);
-      toast.success('Event saved! ❤️');
+      toast.success('Event saved!');
     } catch {
       toast.error('Failed to save event');
     }
@@ -182,7 +183,7 @@ const Dashboard = () => {
               ))
             ) : (
               <div className="empty-state">
-                <p>No upcoming events today. Find some! 🎉</p>
+                <p><CalendarSearch size={20} style={{ verticalAlign: 'middle', marginRight: '0.5rem' }} />No upcoming events today. Find some!</p>
               </div>
             )}
           </div>
@@ -209,7 +210,7 @@ const Dashboard = () => {
         {/* Recommended Events */}
         <section className="recommended-section section-animate delay-2">
           <div className="rec-header">
-            <h3>🎯 Based on your tech prefs:</h3>
+            <h3><Crosshair size={20} style={{ verticalAlign: 'middle', marginRight: '0.5rem', color: '#4f46e5' }} /> Based on your tech prefs:</h3>
           </div>
           <RecommendationGrid 
             events={recommendedEvents} 

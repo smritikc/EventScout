@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
       setToken(token);
       setUser(user);
       
-      toast.success(`Welcome back, ${user.role === 'organizer' ? 'Organizer' : 'Attendee'}! 🎉`);
+      toast.success(`Welcome back, ${user.role === 'organizer' ? 'Organizer' : 'Attendee'}!`);
       
       if (user.role === 'organizer') {
         // navigate('/organizer-dashboard');
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
       setToken(token);
       setUser(user);
       
-      toast.success('Attendee account created! 🎉');
+      toast.success('Attendee account created!');
       // navigate('/pref-quiz');
       return { success: true, user };
     } catch (error) {
@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
       setToken(token);
       setUser(user);
       
-      toast.success('Organizer account created! 🚀');
+      toast.success('Organizer account created!');
       // navigate('/organizer-dashboard');
       return { success: true, user };
     } catch (error) {
@@ -151,7 +151,7 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/auth/me`);
       setUser(response.data.user);
       
-      toast.success('Welcome back! 🎉');
+      toast.success('Welcome back!');
       // navigate('/dashboard');
       return { success: true, user: response.data.user };
     } catch {

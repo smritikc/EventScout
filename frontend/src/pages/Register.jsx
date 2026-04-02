@@ -1,6 +1,6 @@
 import { useState,useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, UserPlus, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, UserPlus, Eye, EyeOff, Crosshair, Bell, Heart } from 'lucide-react';
 import gsap from 'gsap';
 import { useAuth } from '../context/AuthContext';
 import '../styles/auth.css';
@@ -112,7 +112,7 @@ const Register = () => {
       <div className="auth-container">
         <div className="auth-card" ref={formRef}>
           <div className="auth-header">
-            <h1 className="auth-title">Create Account ✨</h1>
+            <h1 className="auth-title">Create Account</h1>
             <p className="auth-subtitle">Join EventScout and discover amazing events</p>
           </div>
 
@@ -263,15 +263,15 @@ const Register = () => {
             <p>Get personalized recommendations, connect with organizers, and never miss an event</p>
             <div className="feature-list">
               <div className="feature-item">
-                <span className="feature-icon">🎯</span>
+                <span className="feature-icon"><Crosshair size={20} /></span>
                 <span>Personalized recommendations</span>
               </div>
               <div className="feature-item">
-                <span className="feature-icon">🔔</span>
+                <span className="feature-icon"><Bell size={20} /></span>
                 <span>Real-time notifications</span>
               </div>
               <div className="feature-item">
-                <span className="feature-icon">❤️</span>
+                <span className="feature-icon"><Heart size={20} /></span>
                 <span>Save your favorite events</span>
               </div>
             </div>

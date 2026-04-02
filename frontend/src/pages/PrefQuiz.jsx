@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, DollarSign, Calendar, ChevronRight } from 'lucide-react';
+import { MapPin, DollarSign, Calendar, ChevronRight, Monitor, Theater, Music, Dumbbell, UtensilsCrossed, Wrench, Crosshair } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import '../styles/pref-quiz.css';
 
 const categories = [
-  { id: 'Tech Meetups', name: 'Tech Meetups', emoji: '💻' },
-  { id: 'Cultural', name: 'Cultural', emoji: '🎭' },
-  { id: 'Music', name: 'Music', emoji: '🎵' },
-  { id: 'Sports', name: 'Sports', emoji: '⚽' },
-  { id: 'Food', name: 'Food', emoji: '🍜' },
-  { id: 'Workshops', name: 'Workshops', emoji: '🔧' }
+  { id: 'Tech Meetups', name: 'Tech Meetups', icon: Monitor },
+  { id: 'Cultural', name: 'Cultural', icon: Theater },
+  { id: 'Music', name: 'Music', icon: Music },
+  { id: 'Sports', name: 'Sports', icon: Dumbbell },
+  { id: 'Food', name: 'Food', icon: UtensilsCrossed },
+  { id: 'Workshops', name: 'Workshops', icon: Wrench }
 ];
 
 const locations = [
@@ -75,7 +75,7 @@ const PrefQuiz = () => {
       if (updatePreferences) {
         await updatePreferences(preferences);
       }
-      toast.success('Preferences saved safely! 🚀');
+      toast.success('Preferences saved!');
       navigate('/dashboard');
     } catch {
       toast.error('Failed to save preferences.');
@@ -94,7 +94,8 @@ const PrefQuiz = () => {
         {/* Header */}
         <div className="pref-quiz-header">
           <h1 className="pref-quiz-title">
-            🎯 Help us find your perfect events, {firstName}!
+            <Crosshair size={24} style={{ verticalAlign: 'middle', marginRight: '0.5rem' }} />
+            Help us find your perfect events, {firstName}!
           </h1>
           <p className="pref-quiz-subtitle">
             Personalize your EventScout experience in 30 seconds.
@@ -118,7 +119,7 @@ const PrefQuiz = () => {
                     preferences.categories.includes(cat.id) ? 'selected' : ''
                   }`}
                 >
-                  <span className="category-emoji">{cat.emoji}</span>
+                  <span className="category-emoji"><cat.icon size={28} /></span>
                   <span className="category-name">{cat.name}</span>
                 </button>
               ))}

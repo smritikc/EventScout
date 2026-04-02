@@ -7,7 +7,7 @@ import User from '../models/Users.js';
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "/api/auth/google/callback"
+ callbackURL: "https://your-backend.onrender.com/api/auth/google/callback"
 },
 async (accessToken, refreshToken, profile, done) => {
   try {
@@ -35,7 +35,7 @@ async (accessToken, refreshToken, profile, done) => {
 passport.use(new FacebookStrategy({
   clientID: process.env.FACEBOOK_APP_ID,
   clientSecret: process.env.FACEBOOK_APP_SECRET,
-  callbackURL: "/api/auth/facebook/callback",
+   callbackURL: "https://your-backend.onrender.com/api/auth/facebook/callback",
   profileFields: ['id', 'displayName', 'emails']
 },
 async (accessToken, refreshToken, profile, done) => {

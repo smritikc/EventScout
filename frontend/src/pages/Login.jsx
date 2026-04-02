@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Mail, Lock, LogIn, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, LogIn, Eye, EyeOff, Theater, Music, Trophy, UtensilsCrossed } from 'lucide-react';
 import gsap from 'gsap';
 import { useAuth } from '../context/AuthContext';
 import '../styles/auth.css';
@@ -48,10 +48,10 @@ const Login = () => {
     const result = await login(formData.email, formData.password, type);
     
     if (result.success) {
-      const destination = result.user?.role === 'organizer' 
-        ? '/organizer-dashboard' 
-        : (from || '/dashboard');
-
+      const destination =
+      type === 'organizer'
+        ? '/organizer-dashboard'
+        : '/dashboard';
       gsap.to('.auth-container', {
         opacity: 0,
         y: -30,
@@ -69,7 +69,7 @@ const Login = () => {
         <div className="auth-card" ref={formRef}>
           <div className="auth-header">
             <h1 className="auth-title">
-              {type === 'organizer' ? 'Organizer Portal' : 'Welcome Back! 👋'}
+              {type === 'organizer' ? 'Organizer Portal' : 'Welcome Back!'}
             </h1>
             <p className="auth-subtitle">
               {type === 'organizer' 
@@ -186,10 +186,10 @@ const Login = () => {
             <h2>Discover Amazing Events</h2>
             <p>Join thousands of event enthusiasts finding their perfect experiences</p>
             <div className="floating-elements">
-              <div className="floating-element">🎭</div>
-              <div className="floating-element">🎵</div>
-              <div className="floating-element">⚽</div>
-              <div className="floating-element">🍜</div>
+              <div className="floating-element"><Theater size={24} /></div>
+              <div className="floating-element"><Music size={24} /></div>
+              <div className="floating-element"><Trophy size={24} /></div>
+              <div className="floating-element"><UtensilsCrossed size={24} /></div>
             </div>
           </div>
         </div>
