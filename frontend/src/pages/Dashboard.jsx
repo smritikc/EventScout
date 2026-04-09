@@ -67,6 +67,22 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('payment') === 'success') {
+      const eventId = params.get('eventId');
+      // In a real production app, Stripe webhooks would handle the actual RSVP in DB.
+      // For local testing, we can do a mock success message, or you could trigger the RSVP api here.
+      toast.success('Payment successful! Your RSVP is confirmed.');
+      // remove query params silently
+      window.history.replaceState({}, document.title, window.location.pathname);
+      fetchDashboardData();
+    } else if (params.get('payment') === 'cancelled') {
+      toast.error('Payment was cancelled.');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [fetchDashboardData]);
+
   // Entrance animation when data is loaded
   useEffect(() => {
     if (!loading) {
@@ -154,14 +170,27 @@ const Dashboard = () => {
             </select>
           </div>
 
-          {/* Profile Menu */}
-          <ProfileMenu 
-            user={user} 
-            show={showProfileMenu} 
-            onToggle={() => setShowProfileMenu(!showProfileMenu)}
-            logout={logout}
-            updateRole={updateRole}
-          />
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            {/* Theme Toggle placeholder (In a real app, bind to context) */}
+            <button className="icon-btn" onClick={() => {
+              const newTheme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+              if (newTheme === 'dark') document.body.classList.add('dark-theme');
+              else document.body.classList.remove('dark-theme');
+              toast.success(`${newTheme} mode enabled!`);
+            }}>
+              {/* Moon icon using div/span if no lucide icon loaded here, but we can just use text or a simple symbol */}
+              🌓
+            </button>
+
+            {/* Profile Menu */}
+            <ProfileMenu 
+              user={user} 
+              show={showProfileMenu} 
+              onToggle={() => setShowProfileMenu(!showProfileMenu)}
+              logout={logout}
+              updateRole={updateRole}
+            />
+          </div>
         </div>
       </header>
 
@@ -196,6 +225,16 @@ const Dashboard = () => {
             <span>Search "tech dh"</span>
           </div>
           <div className="quick-action-btns">
+            {!user?.isOrganizer && (
+              <button 
+                className="qa-btn" 
+                style={{ background: 'var(--primary-color)', color: 'white' }}
+                onClick={() => navigate('/become-organizer')}
+              >
+                <Crosshair size={20} color="white" />
+                <span>Host Event</span>
+              </button>
+            )}
             <button className="qa-btn" onClick={() => navigate('/calendar')}>
               <Calendar size={20} />
               <span>Calendar</span>

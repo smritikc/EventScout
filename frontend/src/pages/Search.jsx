@@ -16,7 +16,9 @@ const Search = () => {
     category: '',
     date: '',
     priceRange: '',
-    location: ''
+    location: '',
+    eventType: '',
+    paymentStatus: ''
   });
   
   const searchRef = useRef(null);
@@ -76,7 +78,9 @@ const Search = () => {
       category: '',
       date: '',
       priceRange: '',
-      location: ''
+      location: '',
+      eventType: '',
+      paymentStatus: ''
     });
   };
 
@@ -181,10 +185,34 @@ const Search = () => {
                 />
               </div>
 
+              <div className="filter-group">
+                <label>Event Type</label>
+                <select 
+                  value={filters.eventType || ''}
+                  onChange={(e) => setFilters({...filters, eventType: e.target.value})}
+                >
+                  <option value="">Any</option>
+                  <option value="onsite">Onsite</option>
+                  <option value="online">Online</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Payment</label>
+                <select 
+                  value={filters.paymentStatus || ''}
+                  onChange={(e) => setFilters({...filters, paymentStatus: e.target.value})}
+                >
+                  <option value="">Any</option>
+                  <option value="free">Free</option>
+                  <option value="paid">Paid</option>
+                </select>
+              </div>
+
               <div className="filter-actions">
                 <button className="apply-filters" onClick={handleSearch}>Apply Filters</button>
                 <button className="clear-filters" onClick={() => setFilters({
-                  category: '', date: '', priceRange: '', location: ''
+                  category: '', date: '', priceRange: '', location: '', eventType: '', paymentStatus: ''
                 })}>Clear</button>
               </div>
             </div>

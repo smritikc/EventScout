@@ -15,7 +15,7 @@ import Profile from './pages/Profile';
 import OAuthSuccess from './pages/OAuthSuccess';
 import Landing from './pages/Landing';
 import OrganizerDashboard from './pages/OrganizerDashboard';
-import OrganizerRegister from './pages/OrganizerRegister';
+import BecomeOrganizer from './pages/BecomeOrganizer';
 import './styles/global.css';
 
 const queryClient = new QueryClient();
@@ -91,7 +91,11 @@ function App() {
                   <OrganizerDashboard />
                 </PrivateRoute>
               } />
-              <Route path="/organizer-register" element={<OrganizerRegister />} />
+              <Route path="/become-organizer" element={
+                <PrivateRoute>
+                  <BecomeOrganizer />
+                </PrivateRoute>
+              } />
               <Route path="/oauth-success" element={<OAuthSuccess />} />
               <Route path="/" element={<Landing />} />
             </Routes>

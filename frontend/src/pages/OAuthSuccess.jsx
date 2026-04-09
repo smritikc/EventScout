@@ -28,8 +28,8 @@ const OAuthSuccess = () => {
       if (token) {
         const result = await loginWithToken(token);
         if (result.success) {
-          const destination = result.user?.role === 'organizer' ? '/organizer-dashboard' : '/dashboard';
-          navigate(destination);
+          // All users must land on user dashboard first, as requested.
+          navigate('/dashboard');
         } else {
           navigate('/login');
         }

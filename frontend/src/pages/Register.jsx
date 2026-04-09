@@ -226,17 +226,11 @@ const Register = () => {
             </button>
           </form>
 
-          <div className="auth-footer">
+          <div className="auth-footer" style={{ paddingBottom: '1rem' }}>
             <p>
               Already have an account?{' '}
               <Link to="/login" className="auth-link">
                 Sign In
-              </Link>
-            </p>
-            <p className="mt-2 text-sm">
-              Want to host events? {' '}
-              <Link to="/organizer-register" className="auth-link font-bold">
-                Register as Organizer
               </Link>
             </p>
           </div>
@@ -246,11 +240,19 @@ const Register = () => {
           </div>
 
           <div className="social-login">
-            <button className="social-btn google">
+            <button 
+              className="social-btn google"
+              type="button"
+              onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`}
+            >
               <img src="https://www.google.com/favicon.ico" alt="Google" />
               Google
             </button>
-            <button className="social-btn facebook">
+            <button 
+              className="social-btn facebook"
+              type="button"
+              onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/auth/facebook`}
+            >
               <img src="https://www.facebook.com/favicon.ico" alt="Facebook" />
               Facebook
             </button>

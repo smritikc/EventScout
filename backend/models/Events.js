@@ -25,6 +25,11 @@ const eventSchema = new mongoose.Schema({
       lng: Number
     }
   },
+  eventType: {
+    type: String,
+    enum: ['online', 'onsite'],
+    default: 'onsite'
+  },
   price: {
     type: Number,
     default: 0
@@ -34,11 +39,26 @@ const eventSchema = new mongoose.Schema({
     enum: ['Free', '<500 NPR', '<2000 NPR'],
     default: 'Free'
   },
+  paymentStatus: {
+    type: String,
+    enum: ['free', 'paid'],
+    default: 'free'
+  },
   capacity: Number,
+  participationType: {
+    type: String,
+    enum: ['individual', 'team', 'both'],
+    default: 'individual'
+  },
+  teamSizeLimit: {
+    type: Number,
+    default: 1
+  },
   attendees: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     status: { type: String, enum: ['confirmed', 'maybe', 'waitlist'] },
-    guests: { type: Number, default: 0 }
+    guests: { type: Number, default: 0 },
+    teamName: String
   }],
   rating: {
     average: { type: Number, default: 0 },

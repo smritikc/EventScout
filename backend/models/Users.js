@@ -53,10 +53,35 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Event'
   }],
+  // Unified Role Architecture Additions
+  isOrganizer: {
+    type: Boolean,
+    default: false
+  },
   role: {
-    type: String,
-    enum: ['user', 'organizer'],
+    type: String, // Kept for backward compatibility, but primarily using isOrganizer now
+    enum: ['user', 'organizer', 'admin'],
     default: 'user'
+  },
+  themePreference: {
+    type: String,
+    enum: ['light', 'dark'],
+    default: 'light'
+  },
+  phone: {
+    type: String
+  },
+  // Organizer Profile Details
+  organizationName: String,
+  logo: String,
+  bio: {
+    type: String,
+    maxlength: [500, 'Bio cannot be more than 500 characters']
+  },
+  website: String,
+  isVerified: {
+    type: Boolean,
+    default: false
   },
   createdAt: {
     type: Date,

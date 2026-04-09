@@ -1,11 +1,10 @@
 import User from '../models/Users.js';
-import Organizer from '../models/Organizers.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 // Generate JWT Token
-export const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
+export const generateToken = (id, isOrganizer, role) => {
+  return jwt.sign({ id, isOrganizer, role }, process.env.JWT_SECRET, {
     expiresIn: '30d'
   });
 };
@@ -15,26 +14,26 @@ export const generateToken = (id, role) => {
 // @access  Public
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, phone } = req.body;
 
-    // Check if user exists in either collection
+    // Check if user exists
     const userExists = await User.findOne({ email });
-    const organizerExists = await Organizer.findOne({ email });
 
-    if (userExists || organizerExists) {
+    if (userExists) {
       return res.status(400).json({ message: 'Account already exists with this email' });
     }
 
-    // Create user
+    // Create user. Everyone starts as standard user.
     const user = await User.create({
       name,
       email,
       password,
-      role: role || 'user'
+      phone,
+      isOrganizer: false
     });
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.isOrganizer, user.role);
 
     res.status(201).json({
       token,
@@ -42,8 +41,10 @@ export const register = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        isOrganizer: user.isOrganizer,
         role: user.role,
-        preferences: user.preferences
+        preferences: user.preferences,
+        themePreference: user.themePreference
       }
     });
   } catch (error) {
@@ -57,21 +58,9 @@ export const register = async (req, res) => {
 // @access  Public
 export const login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body;
 
-    let account = null;
-
-    if (role === 'organizer') {
-      account = await Organizer.findOne({ email }).select('+password');
-    } else if (role === 'attendee' || role === 'user') {
-      account = await User.findOne({ email }).select('+password');
-    } else {
-      // Fallback: Check both if no role specified (for backward compatibility)
-      account = await User.findOne({ email }).select('+password');
-      if (!account) {
-        account = await Organizer.findOne({ email }).select('+password');
-      }
-    }
+    const account = await User.findOne({ email }).select('+password');
 
     if (!account) {
       return res.status(401).json({ message: 'Email not registered' });
@@ -83,8 +72,8 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: 'Incorrect password' });
     }
 
-    // Generate token with role
-    const token = generateToken(account._id, account.role || (account.organizationName ? 'organizer' : 'user'));
+    // Generate token
+    const token = generateToken(account._id, account.isOrganizer, account.role);
 
     res.json({
       token,
@@ -92,9 +81,11 @@ export const login = async (req, res) => {
         id: account._id,
         name: account.name,
         email: account.email,
-        role: account.role || (account.organizationName ? 'organizer' : 'user'),
+        isOrganizer: account.isOrganizer,
+        role: account.role,
         organizationName: account.organizationName,
-        preferences: account.preferences
+        preferences: account.preferences,
+        themePreference: account.themePreference
       }
     });
   } catch (error) {

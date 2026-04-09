@@ -61,7 +61,7 @@ const CreateEventModal = ({ isOpen, onClose, onEventCreated }) => {
         </header>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-grid">
+          <div className="form-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
             <div className="form-group full-width">
               <label><Tag size={16} /> Event Title</label>
               <input 
@@ -89,14 +89,28 @@ const CreateEventModal = ({ isOpen, onClose, onEventCreated }) => {
             </div>
 
             <div className="form-group">
-              <label><MapPin size={16} /> City</label>
-              <input type="text" name="location.city" placeholder="e.g. Kathmandu" onChange={handleChange} />
+              <label>Event Type</label>
+              <select name="eventType" onChange={handleChange} value={formData.eventType || 'onsite'}>
+                <option value="onsite">Onsite (In Person)</option>
+                <option value="online">Online (Virtual)</option>
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Participation</label>
+              <select name="participationType" onChange={handleChange} value={formData.participationType || 'individual'}>
+                <option value="individual">Individual Only</option>
+                <option value="team">Team Only</option>
+                <option value="both">Both</option>
+              </select>
             </div>
 
-            <div className="form-group">
-              <label>Venue</label>
-              <input type="text" name="location.venue" placeholder="e.g. ITC Garden" onChange={handleChange} />
-            </div>
+            {formData.participationType === 'team' || formData.participationType === 'both' ? (
+              <div className="form-group">
+                <label>Max Team Size</label>
+                <input type="number" name="teamSizeLimit" placeholder="e.g. 4" onChange={handleChange} />
+              </div>
+            ) : null}
 
             <div className="form-group">
               <label>Category</label>
@@ -110,17 +124,47 @@ const CreateEventModal = ({ isOpen, onClose, onEventCreated }) => {
               </select>
             </div>
 
+            {formData.eventType === 'onsite' && (
+              <>
+                <div className="form-group">
+                  <label><MapPin size={16} /> City</label>
+                  <input type="text" name="location.city" placeholder="e.g. Kathmandu" onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label>Venue / Location</label>
+                  <input type="text" name="location.venue" placeholder="e.g. ITC Garden" onChange={handleChange} />
+                </div>
+              </>
+            )}
+
+            {formData.eventType === 'online' && (
+              <div className="form-group full-width">
+                <label>Meeting Link (Venue)</label>
+                <input type="text" name="location.venue" placeholder="https://zoom.us/j/..." onChange={handleChange} />
+              </div>
+            )}
+
             <div className="form-group">
               <label><Users size={16} /> Capacity</label>
               <input type="number" name="capacity" placeholder="e.g. 50" onChange={handleChange} />
             </div>
 
             <div className="form-group">
-              <label><DollarSign size={16} /> Price (NPR)</label>
-              <input type="number" name="price" placeholder="0 for Free" onChange={handleChange} />
+              <label>Payment Type</label>
+              <select name="paymentStatus" onChange={handleChange} value={formData.paymentStatus || 'free'}>
+                <option value="free">Free</option>
+                <option value="paid">Paid</option>
+              </select>
             </div>
 
-            <div className="form-group">
+            {formData.paymentStatus === 'paid' && (
+              <div className="form-group">
+                <label><DollarSign size={16} /> Price (NPR)</label>
+                <input type="number" name="price" placeholder="e.g. 500" onChange={handleChange} />
+              </div>
+            )}
+
+            <div className="form-group full-width">
               <label><ImageIcon size={16} /> Image URL</label>
               <input 
                 type="text" name="images.0" placeholder="https://..." 

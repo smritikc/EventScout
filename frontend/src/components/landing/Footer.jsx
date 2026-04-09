@@ -17,14 +17,8 @@ const Footer = () => {
             <Link to="/pricing">Pricing</Link>
           </div>
           <div className="link-group">
-            <h4>For Organizers</h4>
-            <button 
-              className="btn-organizer-link" 
-              onClick={() => window.open('/organizer-register', '_blank')}
-            >
-              Be an Organizer
-            </button>
-            <Link to="/host-guide">Hosting Guide</Link>
+            <h4>Support</h4>
+            <Link to="/help">Help Center</Link>
           </div>
         </div>
       </div>

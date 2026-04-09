@@ -48,12 +48,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = useCallback(async (email, password, role) => {
+  const login = useCallback(async (email, password) => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
         email,
-        password,
-        role
+        password
       });
       
       const { token, user } = response.data;
@@ -62,27 +61,22 @@ export const AuthProvider = ({ children }) => {
       setToken(token);
       setUser(user);
       
-      toast.success(`Welcome back, ${user.role === 'organizer' ? 'Organizer' : 'Attendee'}!`);
+      toast.success(`Welcome back!`);
       
-      if (user.role === 'organizer') {
-        // navigate('/organizer-dashboard');
-      } else {
-        // navigate('/dashboard');
-      }
       return { success: true, user };
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed');
       return { success: false, error: error.response?.data?.message };
     }
-  }, [navigate]);
+  }, []); // removed navigate dependency since it's handled in pages
 
-  const register = useCallback(async (name, email, password) => {
+  const register = useCallback(async (name, email, password, phone) => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, {
         name,
         email,
         password,
-        role: 'user'
+        phone
       });
       
       const { token, user } = response.data;
@@ -91,33 +85,31 @@ export const AuthProvider = ({ children }) => {
       setToken(token);
       setUser(user);
       
-      toast.success('Attendee account created!');
-      // navigate('/pref-quiz');
+      toast.success('Account created successfully!');
       return { success: true, user };
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed');
       return { success: false, error: error.response?.data?.message };
     }
-  }, [navigate]);
+  }, []);
 
-  const registerOrganizer = useCallback(async (formData) => {
+  const becomeOrganizer = useCallback(async (formData) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/organizers/register`, formData);
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/organizers/verify-otp`, formData);
       
-      const { token, user } = response.data;
+      const { token, user: updatedUser } = response.data;
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setToken(token);
-      setUser(user);
+      setUser(prev => ({ ...prev, ...updatedUser }));
       
-      toast.success('Organizer account created!');
-      // navigate('/organizer-dashboard');
-      return { success: true, user };
+      toast.success('You are now an Organizer!');
+      return { success: true, user: updatedUser };
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Organizer registration failed');
+      toast.error(error.response?.data?.message || 'Verification failed');
       return { success: false };
     }
-  }, [navigate]);
+  }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem('token');
@@ -183,7 +175,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
-    registerOrganizer,
+    becomeOrganizer,
     logout,
     updatePreferences,
     loginWithToken,

@@ -16,7 +16,7 @@ router.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/login?error=oauth_failed', session: false }),
   (req, res) => {
-    const token = generateToken(req.user._id);
+    const token = generateToken(req.user._id, req.user.isOrganizer, req.user.role);
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     res.redirect(`${frontendUrl}/oauth-success?token=${token}`);
   }
@@ -29,7 +29,7 @@ router.get(
   '/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/login?error=oauth_failed', session: false }),
   (req, res) => {
-    const token = generateToken(req.user._id);
+    const token = generateToken(req.user._id, req.user.isOrganizer, req.user.role);
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     res.redirect(`${frontendUrl}/oauth-success?token=${token}`);
   }

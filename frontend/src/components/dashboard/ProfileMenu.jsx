@@ -19,15 +19,12 @@ const ProfileMenu = ({ user, show, onToggle, logout, updateRole }) => {
           <button onClick={() => navigate('/wishlist')}>Wishlist</button>
           <button onClick={() => navigate('/profile')}>Account Settings</button>
           
-          {user?.role === 'organizer' ? (
+          {user?.isOrganizer ? (
             <button onClick={() => navigate('/organizer-dashboard')} className="special-link">
               Organizer Dashboard
             </button>
           ) : (
-            <button onClick={async () => {
-              const res = await updateRole('organizer');
-              if (res.success) navigate('/organizer-dashboard');
-            }} className="special-link">
+            <button onClick={() => navigate('/become-organizer')} className="special-link">
               Become an Organizer
             </button>
           )}

@@ -13,8 +13,7 @@ import eventRoutes from './routes/events.js';
 import notificationRoutes from './routes/notification.js';
 import organizerRoutes from './routes/organizers.js';
 import authRoutes from './routes/auth.js';
-
-
+import paymentRoutes from './routes/payments.js';
 
 
 const app = express();
@@ -44,6 +43,7 @@ app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/organizers', organizerRoutes);
+app.use('/api/payments', paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
