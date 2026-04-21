@@ -1,5 +1,5 @@
 import express from 'express';
-import { createEvent, getEvents, getRecommendedEvents, rsvpEvent, updateEvent } from '../controllers/eventController.js';
+import { createEvent, getEvents, getEventById, getRecommendedEvents, rsvpEvent, updateEvent } from '../controllers/eventController.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -7,6 +7,7 @@ const router = express.Router();
 router.post('/', protect, createEvent);
 router.get('/', getEvents);
 router.get('/recommended', protect, getRecommendedEvents);
+router.get('/:eventId', getEventById);
 router.post('/:eventId/rsvp', protect, rsvpEvent);
 router.put('/:eventId', protect, updateEvent);
 

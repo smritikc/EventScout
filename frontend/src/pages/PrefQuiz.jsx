@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, DollarSign, Calendar, ChevronRight, Monitor, Theater, Music, Dumbbell, UtensilsCrossed, Wrench, Crosshair } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import toast from 'react-hot-toast';
 import '../styles/pref-quiz.css';
 

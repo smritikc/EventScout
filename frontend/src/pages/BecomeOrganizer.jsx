@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Mail, CheckCircle, ArrowRight, ShieldCheck, Briefcase } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {  AnimatePresence } from 'framer-motion';
 
 const BecomeOrganizer = () => {
   const { user, becomeOrganizer } = useAuth();

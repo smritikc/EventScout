@@ -2,7 +2,7 @@ import { useState,useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, UserPlus, Eye, EyeOff, Crosshair, Bell, Heart } from 'lucide-react';
 import gsap from 'gsap';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import '../styles/auth.css';
 
 const Register = () => {

@@ -84,4 +84,50 @@
   --z-modal: 1100;
   --z-popover: 1200;
   --z-tooltip: 1300;
+
+  /* Semantic tokens (light defaults) */
+  --bg-base:       #f8fafc;
+  --bg-surface:    #ffffff;
+  --bg-elevated:   #f3f4f6;
+  --bg-input:      #ffffff;
+  --text-primary:  #111827;
+  --text-secondary:#4b5563;
+  --text-muted:    #9ca3af;
+  --border-color:  #e5e7eb;
+  --border-subtle: #f3f4f6;
+  --shadow-color:  rgba(0, 0, 0, 0.08);
+  --primary-color: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-bg:    #eef2ff;
+}
+
+/* ─── Dark Mode Overrides ────────────────────────────────── */
+[data-theme="dark"] {
+  --bg-base:       #0f172a;
+  --bg-surface:    #1e293b;
+  --bg-elevated:   #273449;
+  --bg-input:      #1e293b;
+  --text-primary:  #f1f5f9;
+  --text-secondary:#94a3b8;
+  --text-muted:    #64748b;
+  --border-color:  #334155;
+  --border-subtle: #1e293b;
+  --shadow-color:  rgba(0, 0, 0, 0.4);
+  --primary-bg:    #1e1b4b;
+
+  /* Keep primary accent colours the same – they pop on dark */
+  --primary-color: #818cf8;
+  --primary-hover: #6366f1;
+
+  /* Override gray palette used directly in components */
+  --gray-50:  #1e293b;
+  --gray-100: #273449;
+  --gray-200: #334155;
+  --gray-300: #475569;
+  --gray-400: #64748b;
+  --gray-500: #94a3b8;
+  --gray-600: #cbd5e1;
+  --gray-700: #e2e8f0;
+  --gray-800: #f1f5f9;
+  --gray-900: #f8fafc;
 }

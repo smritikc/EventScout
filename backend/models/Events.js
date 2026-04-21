@@ -67,7 +67,7 @@ const eventSchema = new mongoose.Schema({
   images: [String],
   organizer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Organizer'
+    ref: 'User'
   },
   createdAt: {
     type: Date,

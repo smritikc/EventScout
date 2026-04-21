@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
+import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { 
@@ -7,7 +8,7 @@ import {
   Home, User, Menu, ChevronDown, CheckCircle, AlertCircle,
   Crosshair, Send, CalendarSearch
 } from 'lucide-react';
-import { isToday, isFuture, formatDistanceToNow } from 'date-fns';
+import { isToday, isFuture, isPast, formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 import { getEvents, rsvpEvent, saveEvent } from '../services/eventService';
 import { getNotifications, markAsRead } from '../services/notificationService';
@@ -21,6 +22,7 @@ import '../styles/dashboard.css';
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, logout, updateRole } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [events, setEvents] = useState([]);
   const [recommendedEvents, setRecommendedEvents] = useState([]);
   const [notifications, setNotifications] = useState([]);
@@ -44,19 +46,40 @@ const Dashboard = () => {
       
       const eventsData = eventsDataRaw || [];
       const notifData = notifDataRaw || [];
+
+      // Sort all events by date ascending (soonest first)
+      const sorted = [...eventsData].sort(
+        (a, b) => new Date(a.date) - new Date(b.date)
+      );
+
+      // Top row: events happening today OR in the future
+      const upcomingEvents = sorted.filter(
+        e => e.date && (isToday(new Date(e.date)) || isFuture(new Date(e.date)))
+      );
+      // If no upcoming events, show all events (supports past data in Atlas)
+      setEvents(upcomingEvents.length > 0 ? upcomingEvents : sorted);
       
-      const todayEvents = eventsData.filter(e => e.date && isToday(new Date(e.date)));
-      setEvents(todayEvents);
-      
+      // Recommendations: prefer future events matching user prefs
       const userPrefs = categoriesStr ? categoriesStr.split(',') : [];
-      const recs = eventsData
-        .filter(e => e.category && userPrefs.includes(e.category) && isFuture(new Date(e.date)))
-        .slice(0, 6);
-      
-      setRecommendedEvents(recs.length > 0 ? recs : eventsData.slice(0, 6));
+      const matched = sorted.filter(
+        e => e.category && userPrefs.includes(e.category) && isFuture(new Date(e.date))
+      ).slice(0, 6);
+
+      // Fallback 1: any events matching prefs (ignore date)
+      // Fallback 2: just show all sorted events
+      if (matched.length > 0) {
+        setRecommendedEvents(matched);
+      } else if (userPrefs.length > 0) {
+        const anyMatch = sorted.filter(e => e.category && userPrefs.includes(e.category)).slice(0, 6);
+        setRecommendedEvents(anyMatch.length > 0 ? anyMatch : sorted.slice(0, 6));
+      } else {
+        setRecommendedEvents(sorted.slice(0, 6));
+      }
+
       setNotifications(notifData);
       
-    } catch {
+    } catch (err) {
+      console.error('Dashboard fetch error:', err);
       toast.error('Failed to load dashboard');
     } finally {
       setLoading(false);
@@ -68,20 +91,43 @@ const Dashboard = () => {
   }, [fetchDashboardData]);
 
   useEffect(() => {
+    // Only runs once on mount to check for payment redirect query params
     const params = new URLSearchParams(window.location.search);
     if (params.get('payment') === 'success') {
       const eventId = params.get('eventId');
-      // In a real production app, Stripe webhooks would handle the actual RSVP in DB.
-      // For local testing, we can do a mock success message, or you could trigger the RSVP api here.
-      toast.success('Payment successful! Your RSVP is confirmed.');
-      // remove query params silently
+      const pendingStr = localStorage.getItem('pendingRSVP');
+      
+      if (pendingStr) {
+        try {
+          const pending = JSON.parse(pendingStr);
+          if (pending.eventId === eventId) {
+            rsvpEvent(eventId, { 
+              guests: pending.guests, 
+              status: 'confirmed', 
+              teamName: pending.teamName,
+              email: pending.email 
+            })
+              .then((res) => {
+                toast.success(res.message || 'Payment successful! Your RSVP is confirmed.');
+                fetchDashboardData();
+              })
+              .catch(() => toast.error('Payment succeeded but RSVP failed. Please contact support.'));
+            localStorage.removeItem('pendingRSVP');
+          }
+        } catch(e) {
+          toast.success('Payment successful!');
+        }
+      } else {
+        toast.success('Payment successful!');
+      }
+
       window.history.replaceState({}, document.title, window.location.pathname);
-      fetchDashboardData();
     } else if (params.get('payment') === 'cancelled') {
       toast.error('Payment was cancelled.');
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [fetchDashboardData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Entrance animation when data is loaded
   useEffect(() => {
@@ -101,10 +147,10 @@ const Dashboard = () => {
     setSelectedEventForRSVP(event);
   };
 
-  const confirmRSVP = async ({ guests, status }) => {
+  const confirmRSVP = async ({ guests, status, teamName, email }) => {
     try {
-      await rsvpEvent(selectedEventForRSVP._id, guests);
-      toast.success('Your RSVP confirmed!');
+      const res = await rsvpEvent(selectedEventForRSVP._id, { guests, status, teamName, email });
+      toast.success(res.message || 'Your RSVP confirmed!');
       toast('Organizer notified instantly.', { icon: <Send size={16} color="#4f46e5" />, duration: 2500 });
       fetchDashboardData();
     } catch {
@@ -172,14 +218,13 @@ const Dashboard = () => {
 
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             {/* Theme Toggle placeholder (In a real app, bind to context) */}
-            <button className="icon-btn" onClick={() => {
-              const newTheme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
-              if (newTheme === 'dark') document.body.classList.add('dark-theme');
-              else document.body.classList.remove('dark-theme');
-              toast.success(`${newTheme} mode enabled!`);
-            }}>
-              {/* Moon icon using div/span if no lucide icon loaded here, but we can just use text or a simple symbol */}
-              🌓
+            <button
+              className="icon-btn"
+              onClick={toggleTheme}
+              title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              style={{ fontSize: '1.1rem', padding: '0.35rem' }}
+            >
+              {isDark ? '☀️' : '🌙'}
             </button>
 
             {/* Profile Menu */}
@@ -197,7 +242,7 @@ const Dashboard = () => {
       <main className="dash-main">
         {/* Personalized Section */}
         <section className="personalized-section section-animate">
-          <h2 className="greeting">Good Morning! Your events today:</h2>
+          <h2 className="greeting">Upcoming Events</h2>
           <div className="events-scroll-row">
             {loading ? (
               <div className="skeleton-card"></div>

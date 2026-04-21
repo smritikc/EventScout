@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import gsap from 'gsap';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { getUserStats, updateProfile, uploadProfilePicture } from '../services/userService';
 import { getUserRSVPs } from '../services/eventService';
 import toast from 'react-hot-toast';

@@ -1,19 +1,9 @@
-import { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { AuthContext } from './useAuth';
 
-// Create context
-const AuthContext = createContext();
-
-// Custom hook - this is fine, it's not a component
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
 
 // Provider component - this is the component
 export const AuthProvider = ({ children }) => {
@@ -28,11 +18,12 @@ export const AuthProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    if (token) {
+    if (token && !user) {
       fetchUser();
-    } else {
+    } else if (!token) {
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const fetchUser = async () => {

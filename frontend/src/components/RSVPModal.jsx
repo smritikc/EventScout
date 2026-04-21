@@ -1,11 +1,20 @@
-import { useState } from 'react';
-import { X, Calendar, MapPin, Users } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Calendar, MapPin, Users, Mail } from 'lucide-react';
+import { useAuth } from '../context/useAuth';
 import toast from 'react-hot-toast';
 
 const RSVPModal = ({ event, onClose, onConfirm }) => {
-  const [guests, setGuests] = useState(0); // number of guests excluding self
+  const { user } = useAuth();
+  const [guests, setGuests] = useState(0); 
   const [teamName, setTeamName] = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user?.email) {
+      setEmail(user.email);
+    }
+  }, [user]);
 
   const handleConfirm = async () => {
     if (event.participationType === 'team' && !teamName.trim()) {
@@ -18,10 +27,21 @@ const RSVPModal = ({ event, onClose, onConfirm }) => {
       return;
     }
 
+    if (!email || !email.includes('@')) {
+      toast.error('Please provide a valid email to receive your ticket');
+      return;
+    }
+
     setLoading(true);
 
     if (event.paymentStatus === 'paid') {
       try {
+        localStorage.setItem('pendingRSVP', JSON.stringify({ 
+          eventId: event._id, 
+          guests, 
+          teamName,
+          email 
+        }));
         const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/create-checkout-session`, {
           method: 'POST',
           headers: {
@@ -51,8 +71,21 @@ const RSVPModal = ({ event, onClose, onConfirm }) => {
             form.appendChild(hiddenField);
           });
           
+          // Floating Window trick for eSewa
+          const width = 600;
+          const height = 700;
+          const left = window.screen.width / 2 - width / 2;
+          const top = window.screen.height / 2 - height / 2;
+          
+          window.open('', 'eSewaPopup', `width=${width},height=${height},top=${top},left=${left},toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes`);
+          form.target = 'eSewaPopup';
+          
           document.body.appendChild(form);
           form.submit();
+          
+          // Advise the user
+          toast('eSewa payment window opened. Please complete your transaction.', { duration: 5000, icon: '💳' });
+          onClose(); // close the modal immediately so they see the popup and dashboard
         } else if (data.url) { // Fallback if switched back to stripe
           window.location.href = data.url; 
         } else {
@@ -65,7 +98,7 @@ const RSVPModal = ({ event, onClose, onConfirm }) => {
       }
     } else {
       // Pass data to parent logic for free event RSVP
-      onConfirm({ guests, status: 'confirmed', teamName });
+      onConfirm({ guests, status: 'confirmed', teamName, email });
       setLoading(false);
     }
   };
@@ -123,6 +156,20 @@ const RSVPModal = ({ event, onClose, onConfirm }) => {
             </div>
           )}
 
+          <div className="guest-selector" style={{ marginBottom: '1rem' }}>
+            <label>Email for Ticket <span style={{ color: '#ef4444' }}>*</span></label>
+            <div style={{ display: 'flex', alignItems: 'center', marginTop: '0.5rem', background: '#f9fafb', borderRadius: '8px', border: '1px solid #d1d5db', padding: '0 0.5rem' }}>
+              <Mail size={18} color="#6b7280" />
+              <input 
+                type="email" 
+                placeholder="Where should we send the ticket?" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{ width: '100%', padding: '0.5rem', border: 'none', background: 'transparent', outline: 'none' }}
+              />
+            </div>
+          </div>
+          
           <div className="guest-selector">
             <label>Attending +1 guest?</label>
             <p className="helper-text">Add extra members for your team/group (Max limit: {event.teamSizeLimit || 'No limit'})</p>
@@ -138,7 +185,7 @@ const RSVPModal = ({ event, onClose, onConfirm }) => {
               <button 
                 onClick={() => setGuests(guests + 1)}
                 className="guest-btn"
-                disabled={event.teamSizeLimit && guests >= event.teamSizeLimit - 1} // minus 1 because 1 is the main user
+                disabled={event.participationType !== 'individual' && event.teamSizeLimit && guests >= event.teamSizeLimit - 1}
               >
                 +
               </button>

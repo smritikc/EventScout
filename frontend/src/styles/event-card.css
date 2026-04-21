@@ -302,3 +302,86 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* ─── Event Card Dark Mode ───────────────────────────────── */
+[data-theme="dark"] .event-card {
+  background: var(--bg-surface);
+  box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+[data-theme="dark"] .event-card-image {
+  background: var(--bg-elevated);
+}
+
+[data-theme="dark"] .event-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .event-date-venue {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .event-card-actions {
+  border-top-color: var(--border-subtle);
+}
+
+[data-theme="dark"] .btn-icon-action {
+  background: var(--bg-elevated);
+}
+
+[data-theme="dark"] .btn-icon-action:hover {
+  background: var(--border-color);
+}
+
+[data-theme="dark"] .save-btn.saved {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* RSVP Modal */
+[data-theme="dark"] .rsvp-modal-content {
+  background: var(--bg-surface);
+}
+
+[data-theme="dark"] .rsvp-header {
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .rsvp-header h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .close-btn {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .rsvp-event-summary {
+  background: var(--bg-elevated);
+}
+
+[data-theme="dark"] .summary-item {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .guest-selector label {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .helper-text {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .guest-btn {
+  background: var(--bg-elevated);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .rsvp-footer {
+  border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .btn-cancel {
+  background: var(--bg-elevated);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}

@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import PrivateRoute from './components/PrivateRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -12,6 +13,7 @@ import Search from './pages/Search';
 import Calendar from './pages/Calendar';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
+import EventDetails from './pages/EventDetails';
 import OAuthSuccess from './pages/OAuthSuccess';
 import Landing from './pages/Landing';
 import OrganizerDashboard from './pages/OrganizerDashboard';
@@ -25,8 +27,9 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Router> {/* Router must be outside AuthProvider */}
-        <AuthProvider> {/* AuthProvider now has access to Router context */}
+      <Router>
+        <ThemeProvider>
+        <AuthProvider>
           <div className="app-container">
             <Toaster 
               position="top-right"
@@ -66,6 +69,11 @@ function App() {
                   <Dashboard />
                 </PrivateRoute>
               } />
+              <Route path="/event/:eventId" element={
+                <PrivateRoute>
+                  <EventDetails />
+                </PrivateRoute>
+              } />
               <Route path="/search" element={
                 <PrivateRoute>
                   <Search />
@@ -101,6 +109,7 @@ function App() {
             </Routes>
           </div>
         </AuthProvider>
+        </ThemeProvider>
       </Router>
     </QueryClientProvider>
   );

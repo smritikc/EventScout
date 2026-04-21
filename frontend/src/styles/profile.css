@@ -421,3 +421,126 @@ textarea.edit-input {
     align-items: center;
   }
 }
+
+/* ─── Profile Dark Mode ──────────────────────────────────── */
+[data-theme="dark"] .profile-page {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+}
+
+[data-theme="dark"] .profile-header {
+  background: var(--bg-surface);
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .settings-btn {
+  background: var(--bg-elevated);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .settings-btn:hover {
+  background: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .profile-card {
+  background: var(--bg-surface);
+  box-shadow: 0 10px 15px -3px var(--shadow-color);
+}
+
+[data-theme="dark"] .profile-avatar {
+  background: var(--bg-elevated);
+  border-color: var(--bg-surface);
+}
+
+[data-theme="dark"] .profile-name {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .profile-bio {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .meta-item {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .edit-profile-btn {
+  background: var(--primary-bg);
+  color: var(--primary-color);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .edit-input {
+  background: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .edit-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+}
+
+[data-theme="dark"] .cancel-btn {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .stat-card {
+  background: var(--bg-surface);
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+[data-theme="dark"] .stat-icon {
+  background: var(--primary-bg);
+}
+
+[data-theme="dark"] .stat-value {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .stat-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .recent-activity {
+  background: var(--bg-surface);
+}
+
+[data-theme="dark"] .recent-activity h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .activity-item {
+  background: var(--bg-elevated);
+}
+
+[data-theme="dark"] .activity-item:hover {
+  background: var(--border-color);
+}
+
+[data-theme="dark"] .activity-icon {
+  background: var(--bg-surface);
+}
+
+[data-theme="dark"] .activity-details h4 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .activity-details p {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .quick-actions {
+  background: var(--bg-surface);
+}
+
+[data-theme="dark"] .action-item {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .action-item:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}

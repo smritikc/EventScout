@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, LogIn, Eye, EyeOff, Theater, Music, Trophy, UtensilsCrossed } from 'lucide-react';
 import gsap from 'gsap';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import '../styles/auth.css';
 import '../styles/login.css';
 

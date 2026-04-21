@@ -52,6 +52,23 @@ export const getEvents = async (req, res) => {
   }
 };
 
+// GET EVENT BY ID
+export const getEventById = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const event = await Event.findById(eventId)
+      .populate('organizer', 'name email organizationName logo');
+      
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    
+    res.json({ event });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // GET RECOMMENDED EVENTS
 export const getRecommendedEvents = async (req, res) => {
   try {
@@ -76,7 +93,7 @@ export const getRecommendedEvents = async (req, res) => {
 export const rsvpEvent = async (req, res) => {
   try {
     const { eventId } = req.params;
-    const { guests, status = 'confirmed', teamName } = req.body;
+    const { guests, status = 'confirmed', teamName, email } = req.body;
 
     const event = await Event.findById(eventId);
     if (!event) return res.status(404).json({ message: 'Event not found' });
@@ -86,7 +103,7 @@ export const rsvpEvent = async (req, res) => {
     }
 
     // Check if user already RSVP'd
-    const alreadyRSVP = event.attendees.find(a => a.user.toString() === req.user.id);
+    const alreadyRSVP = event.attendees.find(a => a.user && a.user.toString() === req.user.id);
     if (alreadyRSVP) {
       alreadyRSVP.guests = guests;
       alreadyRSVP.status = status;
@@ -96,7 +113,35 @@ export const rsvpEvent = async (req, res) => {
     }
 
     await event.save();
-    res.json({ message: 'RSVP successful', event });
+    
+    // SEND TICKET VIA EMAIL IF PROVIDED
+    const ticketEmail = email || req.user.email;
+    if (ticketEmail && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      const isPaid = event.paymentStatus === 'paid';
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: ticketEmail,
+        subject: `Your Ticket for ${event.title}`,
+        html: `
+          <div style="font-family: sans-serif; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #4f46e5;">Event Ticket Confirmed!</h2>
+            <p>Thank you for RSVPing to <strong>${event.title}</strong>.</p>
+            <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <p><strong>Date:</strong> ${new Date(event.date).toLocaleDateString()}</p>
+              <p><strong>Location:</strong> ${event.location?.venue || 'Online'}</p>
+              <p><strong>Guests (excluding you):</strong> ${guests}</p>
+              ${teamName ? `<p><strong>Team:</strong> ${teamName}</p>` : ''}
+              ${isPaid ? `<p><strong>Payment Status:</strong> Paid via eSewa</p>` : `<p><strong>Entry:</strong> Free</p>`}
+            </div>
+            <p style="color: #6b7280; font-size: 0.9em;">Please present this email at the venue.</p>
+          </div>
+        `
+      };
+      
+      transporter.sendMail(mailOptions).catch(err => console.error("Ticket email failed to send:", err));
+    }
+
+    res.json({ message: 'RSVP successful! Ticket sent to email.', event });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
