@@ -64,8 +64,8 @@ System generates a ticket:
   "qrCode": "encrypted_secure_token",
   "status": "valid"
 }
------
-# 4️⃣ Ticket Delivery
+
+4️⃣ Ticket Delivery
 
 User receives ticket via:
 
