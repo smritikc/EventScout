@@ -214,10 +214,10 @@ JWT_SECRET=your_secret_key
 Run the project
 Start Backend
 cd backend
-npm start
+npm run dev
 Start Frontend
 cd frontend
-npm start
+npm run dev
 
 Future Improvements
 🔔 Event notifications
