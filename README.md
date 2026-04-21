@@ -30,7 +30,9 @@ EventScout solves the problem of fragmented event discovery and manual registrat
 
 # 🎟️ Ticket System (Core Feature)
 
-The ticket system ensures every valid user gets a **secure, unique digital ticket**.
+The ticket system ensures every valid user gets a secure, unique digital ticket.
+
+---
 
 ## 🧭 How Ticket System Works
 
@@ -44,7 +46,7 @@ Backend checks:
 ---
 
 ### 2️⃣ Payment (if required)
-If event is paid:
+If the event is paid:
 
 - User completes payment via gateway (Stripe / Khalti / Esewa)
 - Backend verifies payment (NOT frontend)
@@ -52,11 +54,10 @@ If event is paid:
 ---
 
 ### 3️⃣ Ticket Generation
-After successful registration/payment:
 
-System generates a ticket:
+After successful registration/payment, system generates a ticket:
 
-```json id="ticket_example"
+```json
 {
   "ticketId": "EVT-8X92K-2026",
   "userId": "USER123",
@@ -64,21 +65,25 @@ System generates a ticket:
   "qrCode": "encrypted_secure_token",
   "status": "valid"
 }
+```
 
-4️⃣ Ticket Delivery
+---
+
+### 4️⃣ Ticket Delivery
 
 User receives ticket via:
+- Dashboard download  
+- Email  
+- QR code display  
 
-Dashboard download
-Email
-QR code display
-5️⃣ Event Entry (Validation)
+---
+
+### 5️⃣ Event Entry (Validation)
 
 At event gate:
-
-Organizer scans QR code
-Backend verifies ticket
-Marks ticket as USED
+- Organizer scans QR code  
+- Backend verifies ticket  
+- Marks ticket as **USED**
 🔐 Security System (VERY IMPORTANT)
 
 EventScout ensures only valid users get tickets.
