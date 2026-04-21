@@ -33,35 +33,33 @@ It is built using the **MERN Stack (MongoDB, Express, React, Node.js)** and focu
 - MongoDB (Mongoose)  
 
 ---
-
 ## 📁 Project Structure
 
-
+```bash
 EventScout/
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── styles/
+│   │   ├── App.js
+│   │   └── index.js
+│   └── package.json
 │
-├── frontend/ # React Frontend
-│ ├── public/
-│ ├── src/
-│ │ ├── components/ # Reusable UI components
-│ │ ├── pages/ # Pages (Home, Events, Login, etc.)
-│ │ ├── services/ # API calls (Axios)
-│ │ ├── styles/ # CSS files
-│ │ ├── App.js
-│ │ └── index.js
-│ └── package.json
+├── backend/
+│   ├── config/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── middleware/
+│   ├── server.js
+│   └── package.json
 │
-├── backend/ # Node.js Backend
-│ ├── config/ # DB connection config
-│ ├── controllers/ # Business logic
-│ ├── models/ # Mongoose schemas
-│ ├── routes/ # API routes
-│ ├── middleware/ # Auth middleware
-│ ├── server.js # Entry point
-│ └── package.json
-│
-├── .gitignore
 ├── README.md
-└── package.json
+└── .gitignore
+```
 ## ⚙️ Installation & Setup
 
 ### 1️⃣ Clone the repository
